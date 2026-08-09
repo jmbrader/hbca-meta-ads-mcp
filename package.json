@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node --max-old-space-size=3072 ./node_modules/typescript/bin/tsc"
+    "build": "node --max-old-space-size=3072 ./node_modules/typescript/bin/tsc",
     "start": "node dist/index.js"
   },
   "engines": {
