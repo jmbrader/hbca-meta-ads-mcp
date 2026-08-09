@@ -429,6 +429,40 @@ function createServer() {
 
   return server;
 }
+server.registerTool(
+  "pause_campaign",
+  {
+    title: "Pause Meta campaign",
+    description:
+      "Pause a Meta Ads campaign in the configured ad account.",
+
+    inputSchema: z.object({
+      campaign_id: z
+        .string()
+        .describe("The Meta campaign ID to pause."),
+    }) as any,
+
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: true,
+      openWorldHint: false,
+    },
+  },
+
+  async (args: any) => {
+    const { campaign_id } = args;
+
+    const result = await metaPost(campaign_id, {
+      status: "PAUSED",
+    });
+
+    return textResult({
+      action: "pause_campaign",
+      campaign_id,
+      meta_response: result,
+    });
+  }
+);
 
 const app = express();
 
