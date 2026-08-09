@@ -58,32 +58,61 @@ function createServer() {
   );
 
   server.registerTool(
-    "get_campaigns",
-    {
-      title: "Get campaigns",
-      description: "List campaigns for a Meta ad account with names, statuses, objectives, and dates.",
-      inputSchema: {
-        ad_account_id: z.string().optional().describe("Meta ad account ID, e.g. act_123. Defaults to configured account."),
-        limit: z.number().int().min(1).max(500).default(100),
-      },
-      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+  "get_campaigns",
+  {
+    title: "Get campaigns",
+    description:
+      "List campaigns for a Meta ad account with names, statuses, objectives, and dates.",
+
+    inputSchema: z.object({
+      ad_account_id: z
+        .string()
+        .optional()
+        .describe(
+          "Meta ad account ID, e.g. act_123. Defaults to configured account."
+        ),
+
+      limit: z
+        .number()
+        .int()
+        .min(1)
+        .max(500)
+        .default(100),
+    }),
+
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      openWorldHint: false,
     },
-    async ({ ad_account_id, limit }) => {
-      const account = ad_account_id || DEFAULT_AD_ACCOUNT_ID;
-      const data = await metaGet(`${account}/campaigns`, {
-        fields: "id,name,status,effective_status,objective,buying_type,start_time,stop_time",
-        limit,
-      });
-      return { content: [{ type: "text", text: JSON.stringify(data) }] };
-    }
-  );
+  },
+
+  async ({ ad_account_id, limit }) => {
+    const account = ad_account_id || DEFAULT_AD_ACCOUNT_ID;
+
+    const data = await metaGet(`${account}/campaigns`, {
+      fields:
+        "id,name,status,effective_status,objective,buying_type,start_time,stop_time",
+      limit,
+    });
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(data),
+        },
+      ],
+    };
+  }
+);
 
   server.registerTool(
     "get_adsets",
     {
       title: "Get ad sets",
       description: "List ad sets for a Meta ad account, including campaign IDs, statuses, budgets, optimization goal, and targeting summary.",
-      inputSchema: {
+      inputSchema: z.object(
         ad_account_id: z.string().optional(),
         limit: z.number().int().min(1).max(500).default(100),
       },
