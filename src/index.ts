@@ -62,6 +62,49 @@ async function metaGet(
 
   return payload;
 }
+async function metaPost(
+  path: string,
+  params: Record<string, QueryValue> = {}
+) {
+  const url = new URL(
+    `${GRAPH_BASE}/${path.replace(/^\//, "")}`
+  );
+
+  const body = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined) {
+      body.set(key, String(value));
+    }
+  }
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${META_ACCESS_TOKEN}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body,
+  });
+
+  const text = await res.text();
+
+  let payload: unknown;
+
+  try {
+    payload = JSON.parse(text);
+  } catch {
+    payload = { raw: text };
+  }
+
+  if (!res.ok) {
+    throw new Error(
+      `Meta API ${res.status}: ${JSON.stringify(payload)}`
+    );
+  }
+
+  return payload;
+}
 
 function textResult(data: unknown) {
   return {
